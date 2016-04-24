@@ -12,5 +12,8 @@
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-coffeeify": "^0.1.8"
+  },
+  "dependencies": {
+    "jpickle": "^0.4.1"
   }
 }
