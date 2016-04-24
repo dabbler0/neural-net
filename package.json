@@ -1,0 +1,16 @@
+{
+  "name": "neural-net",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "David Anthony Bau <dab1998@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-coffeeify": "^0.1.8"
+  }
+}
