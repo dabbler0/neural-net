@@ -29,7 +29,9 @@ class NeuralNet
 
     estimated = current
 
+    derivatives = []
     derivative = estimate.map (x, i) -> x - output[i]
 
     for edge, i in edges by -1
-      derivative = numeric. 
+      derivatives.push derivative
+      derivative = numeric.dot(edge, derivative).map (x) -> x * helper.dsigmoid layers[i]
