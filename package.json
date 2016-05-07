@@ -14,6 +14,7 @@
     "gulp-coffeeify": "^0.1.8"
   },
   "dependencies": {
-    "jpickle": "^0.4.1"
+    "jpickle": "^0.4.1",
+    "numeric": "^1.2.6"
   }
 }
