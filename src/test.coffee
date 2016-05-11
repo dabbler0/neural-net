@@ -1,6 +1,6 @@
 {NeuralNet} = require './neural_net.coffee'
 
-net = new NeuralNet 2, [4], 2, {lambda: 0.03}
+net = new NeuralNet 2, [4], 2, {lambda: 0.03, costDerivative: (actual, estimated) -> actual / estimated - (1 - actual) / (1 - estimated)}
 
 getRandomInput = ->
   [Math.random() * 2 - 1, Math.random() * 2 - 1]

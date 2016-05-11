@@ -9,6 +9,8 @@ exports.NeuralNet = class NeuralNet
     @lambda = options.lambda ? 0.1
     # @rectifier: rectifier function
     @rectifier = options.rectifier ? new Rectifier(helper.sigmoid, helper.dsigmoid)
+    # @costDerivative
+    @costDerivative = options.costDerivative ? (actual, estimated) -> actual - estimated
 
     rng_bias = options.rng_bias ? Math.random
     rng_edges = options.rng_edges ? Math.random
@@ -69,7 +71,7 @@ exports.NeuralNet = class NeuralNet
 
     # Get initial derivative dC/da[out] where a[out] is the output layer
     estimated = current
-    derivativeA = estimated.map (x, i) -> output[i] - x
+    derivativeA = estimated.map (x, i) => @costDerivative(output[i], x)
 
     # Keep track of the derivatives dC/dz[i] where z[i] is the unrectified value of layer i.
     derivatives = []
