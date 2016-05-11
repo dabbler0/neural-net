@@ -1,4 +1,5 @@
 numeric = require 'numeric'
+helper = require './helper.coffee'
 
 class NeuralNet
   constructor: (input, layers, outputs, options) ->
@@ -20,12 +21,9 @@ class NeuralNet
     # Unpack options
     # --------------
     # @lambda: learning rate
-    @lambda = 0.1 ? options.lambda#
+    @lambda = 0.1 ? options.lambda
     # @rectifier: rectifier function
-    @rectifier = {
-      apply: helper.sigmoid
-      derivative: helper.dsigmoid
-    } ? options.rectifier
+    @rectifier = new Rectifier(helper.sigmoid, helper.dsigmoid) ? options.rectifier
 
     return
 
@@ -118,3 +116,9 @@ class NeuralNet
       @biases[i] = helper.matrixAdd @biases[i], helper.scalarMultiply @lamba, biasUpdates[i]
 
     return
+
+class Rectifier
+  constructor: (@apply, @derivative) ->
+    # Approximate the derivative if it is not given
+    @derivative ?= (x) ->
+      (@apply(x + helper.epsilon) - @apply(x - helper.epsilon)) / (2 * helper.epsilon)
