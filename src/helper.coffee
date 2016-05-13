@@ -1,3 +1,4 @@
+## RECTIFIER FUNCTIONS
 # Sigmoid
 exports.sigmoid = (x) -> 1 / (1 + Math.E ** -x)
 exports.dsigmoid = (x) ->
@@ -7,6 +8,10 @@ exports.dsigmoid = (x) ->
 # Rectified linear unit
 exports.relu = (x) -> Math.max(x, 0)
 exports.drelu = (x) -> if x > 0 then 1 else 0
+
+## COST FUNCTIONS
+exports.quadraticDerivative = (actual, estimated) -> actual - estimated
+exports.crossEntropyDerivative = (actual, estimated) -> actual / estimated - (1 - actual) / (1 - estimated)
 
 # Simple matrix operations
 exports.scalarMultiply = (scalar, matrix) ->

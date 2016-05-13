@@ -10,10 +10,10 @@ exports.NeuralNet = class NeuralNet
     # @rectifier: rectifier function
     @rectifier = options.rectifier ? new Rectifier(helper.sigmoid, helper.dsigmoid)
     # @costDerivative
-    @costDerivative = options.costDerivative ? (actual, estimated) -> actual - estimated
+    @costDerivative = options.costDerivative ? helper.crossEntropyDerivative
 
-    rng_bias = options.rng_bias ? Math.random
-    rng_edges = options.rng_edges ? Math.random
+    rng_bias = options.rng_bias ? -> (Math.random() - 0.5) * 100
+    rng_edges = options.rng_edges ? -> (Math.random() - 0.5) * 100
 
     # Populate @biases.
     # @biases has @biases[i] being added to layers[i];
@@ -45,7 +45,20 @@ exports.NeuralNet = class NeuralNet
 
     return current
 
-  train: (input, output) ->
+  update: (batch) ->
+    for edge, i in @edges
+      @edges[i] = helper.matrixAdd @edges[i], helper.scalarMultiply @lambda / batch.size, batch.edges[i]
+    @biases = helper.matrixAdd @biases, helper.scalarMultiply @lambda / batch.size, batch.biases
+
+    return
+
+  createBatch: ->
+    return new Batch(
+      @edges.map((layer) -> layer.map (row) -> row.map -> 0),
+      @biases.map((layer) -> layer.map -> 0)
+    )
+
+  feed: (input, output, batch) ->
     # Run things forward, keeping track of the unrectified values
     # unrectified has unrectified[i] as the *output* layer of edges[i].
     # rectified has rectified[i] as the *input* layer of edges[i].
@@ -114,13 +127,32 @@ exports.NeuralNet = class NeuralNet
       numeric.dot numeric.transpose([derivative]), [rectified[i]]
     biasUpdates = derivatives
 
-    # Perform gradient descent update
-    for edge, i in @edges
-      @edges[i] = helper.matrixAdd edge, helper.scalarMultiply @lambda, edgeUpdates[i]
+    ###
+    console.log 'UNRECTIFIED', unrectified
+    console.log 'RECTIFIED', rectified
+    console.log 'RESULTANT EDGE UPDATES', edgeUpdates
+    console.log 'RESULTANT BIAS UPDATES', biasUpdates
+    ###
 
-    @biases = helper.matrixAdd @biases, helper.scalarMultiply @lambda, biasUpdates
+    # Add to batch
+    for edge, i in batch.edges
+      batch.edges[i] = helper.matrixAdd edge, edgeUpdates[i]
+    batch.biases = helper.matrixAdd batch.biases, biasUpdates
 
-    return
+    batch.size += 1
+    batch.averageError += estimated.map(
+      (x, i) -> output[i] * Math.log(x) + (1 - output[i]) * Math.log(1 - x)
+    ).reduce((a, b) -> a + b)
+
+    if batch.averageError isnt batch.averageError
+      console.log output, estimated
+      throw new Error 'bad'
+
+    return batch
+
+class Batch
+  constructor: (@edges, @biases, @size = 0) ->
+    @averageError = 0
 
 exports.Rectifier = class Rectifier
   constructor: (@apply, @derivative) ->
